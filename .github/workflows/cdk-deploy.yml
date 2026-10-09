@@ -1,0 +1,26 @@
+# Etapa 1 (versión CDK) — solo en push a main.
+# GUÍA: tú escribes el YAML real.
+#
+# Preguntas antes de escribirlo:
+#   - ¿Qué valor de `sub` acepta la trust policy de ci-deploy?
+#   - ¿Qué hace `--require-approval never` y por qué en CI es aceptable (o no)?
+#   - CiAccessStack se desplegó a mano: ¿debe este pipeline poder modificarlo?
+#
+# Pasos esperados (working-directory: infra/cdk):
+#   1. checkout + setup-node + npm ci
+#   2. configure-aws-credentials con role-to-assume = ci-deploy (OIDC)
+#   3. cdk deploy de GatewayStack y ObservabilityStack (no de CiAccessStack)
+#   4. prueba de humo (scripts/smoke-test.sh) cuando exista el gateway
+
+name: cdk-deploy
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/cdk/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO: implementar los pasos de arriba"

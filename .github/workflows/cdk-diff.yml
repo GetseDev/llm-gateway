@@ -1,0 +1,28 @@
+# Etapa 1 (versión CDK) — corre en cada pull request.
+# GUÍA: tú escribes el YAML real.
+#
+# Preguntas antes de escribirlo:
+#   - El rol ci-diff solo puede asumir el lookup role del bootstrap. ¿Le alcanza para `cdk diff`?
+#   - ¿Por qué conviene correr cdk-nag y Jest ANTES de pedir credenciales a AWS?
+#
+# Pasos esperados (working-directory: infra/cdk):
+#   1. checkout + setup-node (versión fijada) + npm ci
+#   2. lint y compilación de TypeScript
+#   3. npm test (Jest con aserciones)
+#   4. cdk synth (con cdk-nag aplicado a la App) — falla si hay hallazgos
+#   5. checkov sobre cdk.out/ (opcional, para comparar con Terraform)
+#   6. configure-aws-credentials con role-to-assume = ci-diff (OIDC)
+#   7. cdk diff de todos los stacks; publicarlo en el PR (opcional)
+
+name: cdk-diff
+on:
+  pull_request:
+    paths:
+      - "infra/cdk/**"
+      - ".github/workflows/cdk-*.yml"
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO: implementar los pasos de arriba"

@@ -1,0 +1,23 @@
+# Etapa 2 — pruebas del código Python. Nunca llama a un modelo de pago: usa el adaptador fake.
+# GUÍA: tú escribes el YAML real.
+#
+# Pasos esperados:
+#   1. checkout
+#   2. instalar uv y sincronizar dependencias desde el lockfile
+#   3. ruff check y ruff format --check
+#   4. pytest
+#   5. trivy (dependencias / imagen)
+#   6. (etapa 4) correr evals/ con el adaptador fake
+
+name: gateway-ci
+on:
+  pull_request:
+    paths:
+      - "gateway/**"
+      - "evals/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO: implementar en la etapa 2"

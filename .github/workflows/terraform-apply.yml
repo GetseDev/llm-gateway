@@ -1,0 +1,27 @@
+# Etapa 1 — corre solo en push a main.
+# GUÍA: tú escribes el YAML real.
+#
+# Preguntas antes de escribirlo:
+#   - La trust policy del rol ci-apply, ¿qué valor de `sub` acepta exactamente?
+#   - ¿Te conviene un GitHub Environment con aprobación manual antes del apply?
+#   - ¿Qué pasa si dos merges a main llegan casi al mismo tiempo? (pista: concurrency + lock)
+#
+# Pasos esperados:
+#   1. checkout + setup-terraform
+#   2. configure-aws-credentials con role-to-assume = rol ci-apply (OIDC)
+#   3. terraform init en infra/terraform/envs/dev
+#   4. terraform apply -auto-approve (o plan guardado + apply de ese plan)
+#   5. prueba de humo (scripts/smoke-test.sh) cuando exista el gateway
+
+name: terraform-apply
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/terraform/**"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO: implementar los pasos de arriba"

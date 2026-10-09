@@ -1,0 +1,6 @@
+# Ganchos que corren antes de cada commit. Instala con: pre-commit install
+# TODO (etapa 1): agrega los hooks y fija cada `rev` a una versión concreta.
+#   - gitleaks            → evita subir secretos
+#   - terraform fmt / tflint (pre-commit-terraform)
+#   - ruff                → estilo de Python (etapa 2)
+repos: []

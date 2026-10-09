@@ -1,0 +1,31 @@
+# Etapa 1 — corre en cada pull request.
+# Esto es una GUÍA: los pasos están descritos, tú escribes el YAML real.
+#
+# Preguntas antes de escribirlo:
+#   - ¿Qué bloque `permissions:` necesita el job para pedir el token OIDC? ¿Y para comentar el plan en el PR?
+#   - ¿Por qué este workflow NO debe poder asumir el rol de apply?
+#
+# Pasos esperados:
+#   1. checkout
+#   2. setup-terraform (versión fijada)
+#   3. terraform fmt -check -recursive
+#   4. tflint
+#   5. checkov sobre infra/terraform/
+#   6. gitleaks
+#   7. configure-aws-credentials con role-to-assume = rol ci-plan (vía OIDC, sin llaves)
+#   8. terraform init + validate en infra/terraform/envs/dev
+#   9. terraform plan (¿con o sin lock? decídelo y escríbelo en un ADR)
+#  10. publicar el plan como comentario del PR (opcional)
+
+name: terraform-plan
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform-*.yml"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO: implementar los pasos de arriba"

@@ -1,0 +1,34 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+.terraform.tfstate.lock.info
+# Las variables con valores reales no se suben; deja un *.tfvars.example
+*.tfvars
+!*.tfvars.example
+# .terraform.lock.hcl SÍ se sube (fija versiones de providers)
+
+# CDK / Node
+node_modules/
+cdk.out/
+cdk.context.json.bak
+*.js.map
+# cdk.context.json SÍ se sube (fija resultados de lookups)
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# Secretos y local
+.env
+.env.*
+!.env.example
+*.pem
+.DS_Store

@@ -1,0 +1,23 @@
+# Etapa 2. Equivalente aproximado a tu pom.xml de Maven: metadatos, dependencias y config de herramientas.
+# Agrega dependencias con `uv add <paquete>` (se registran aquí y en uv.lock), no editando a mano.
+
+[project]
+name = "llm-gateway"
+version = "0.1.0"
+description = "Gateway de LLM independiente del proveedor"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = []  # TODO: pytest, ruff (con `uv add --dev`)
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F: errores básicos · I: orden de imports · UP: sintaxis moderna · B: bugs comunes
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
