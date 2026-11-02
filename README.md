@@ -1,48 +1,71 @@
 # LLM Gateway
 
-Una puerta de entrada única a modelos de IA con autenticación, presupuestos por equipo,
-medición de costos y guardrails. Independiente del proveedor.
+A single, provider-agnostic entry point to LLMs on AWS, with authentication, per-team budgets,
+cost metering and guardrails. Built as a platform-engineering portfolio project by
+[Josué Getsemani](https://getsedev.github.io/GetseDev/) (DevOps / Platform Engineer).
 
-> Estado: etapa 1 (base). Este README es la plantilla del portafolio; cada sección se llena
-> cuando la etapa correspondiente esté terminada.
+> **Status: stage 1 (foundation) done, stage 2 (gateway code) in progress.**
+> The infrastructure and CI/CD are in place; the Python gateway (`gateway/src/llm_gateway`) is still scaffolding.
+> Design docs are written in Spanish.
 
-## Por qué existe
-<2-3 líneas: el problema de plataforma que resuelve>
+## Why it exists
 
-## Arquitectura
-Ver `docs/diagrams/architecture.md`. Pega aquí el diagrama cuando la etapa 2 esté lista.
+Teams that call LLM providers directly end up with scattered API keys, no cost visibility and no
+way to switch provider. This project puts one gateway in front of them: one auth model, one budget
+per team, one place to measure tokens, latency and cost, and an adapter layer so changing model
+provider does not break clients.
 
-## Qué demuestra
-- Infraestructura como código en dos herramientas (Terraform y CDK), probada y comparada
-- CI/CD sin llaves estáticas (OIDC) y mínimo privilegio con permissions boundary
-- Presupuestos y medición de costo por equipo
-- Cambio de proveedor de modelo sin romper clientes (patrón de adaptadores)
+## Architecture
 
-## Probarlo en 5 minutos (local, costo cero)
-<pasos con uv y el adaptador fake — etapa 2>
+```
+Clients → API Gateway → Lambda (Python): auth → per-team limit/budget → guardrails → provider router → metering
+                              │                                                  │
+                         DynamoDB (keys, budgets, usage)        fake · Ollama (local) · hosted API · Bedrock (optional)
+                         Secrets Manager / SSM · CloudWatch · AWS Budgets
+```
 
-## Desplegar en AWS
-<bootstrap, apply, smoke test, destroy — ver scripts/>
+Full Mermaid diagrams: [`docs/diagrams/architecture.md`](docs/diagrams/architecture.md).
+Locally, API Gateway + Lambda are replaced by FastAPI and DynamoDB by SQLite.
 
-## Seguridad
-Resumen y enlace a `docs/threat-model.md`.
+## What is already built
 
-## Decisiones
-Ver `docs/adr/`.
+- **Terraform modules, each with `terraform test` suites** (mock provider): `budget-alarm`, `ci-roles`, `data-store`, `gateway-api`, `github-oidc`, `observability`, plus a `bootstrap` stack and a `dev` environment.
+- **Same infrastructure ported to AWS CDK (TypeScript)** with constructs for the API, data store, secrets, observability, OIDC and a permissions boundary, plus CDK tests. The goal is a reasoned Terraform-vs-CDK comparison ([`docs/comparativa-iac.md`](docs/comparativa-iac.md), being filled in as each stage is ported).
+- **CI/CD with GitHub Actions and no static keys (OIDC)**: plan on pull request, apply on `main`, CDK diff/deploy, gateway CI. Least-privilege roles with a permissions boundary.
+- **Cost guardrail**: monthly AWS Budgets alarm module, tested.
+- **Threat model and ADRs**: [`docs/threat-model.md`](docs/threat-model.md), [`docs/adr/`](docs/adr/).
 
-## Costos
-<cuánto cuesta tenerlo encendido y cómo destruirlo con un comando>
+## Roadmap
 
-## Estructura
+| Stage | Scope | Status |
+| --- | --- | --- |
+| 1 | IaC base (Terraform + CDK), OIDC CI/CD, budget alarm | Done |
+| 2 | Gateway: auth, routing, fake + local provider | In progress |
+| 3 | Metering: tokens, latency, cost per team | Planned |
+| 4 | Quality: evals and guardrails | Planned |
+| 5 | Multi-provider and final documentation | Planned |
 
-La infraestructura existe en dos versiones equivalentes: Terraform y AWS CDK (TypeScript).
-El código del gateway es uno solo. La comparación entre ambas está en `docs/comparativa-iac.md`.
+## Layout
 
 ```
 infra/terraform/    bootstrap/, modules/, envs/dev/
 infra/cdk/          bin/, lib/constructs/, lib/stacks/, test/
-gateway/            código Python compartido (src/ + tests/)
-evals/              prompts de prueba (etapa 4)
-scripts/            bootstrap, smoke test, destroy
-docs/               ADRs, diagramas, modelo de amenazas, comparativa IaC
+gateway/            shared Python code (src/ + tests/)
+evals/              test prompts (stage 4)
+docs/               ADRs, diagrams, threat model, IaC comparison
+.github/workflows/  plan/apply, CDK diff/deploy, gateway CI
 ```
+
+## Run the Terraform tests
+
+```bash
+cd infra/terraform/modules/budget-alarm
+terraform init -backend=false
+terraform test
+```
+
+(Same for the other modules. No AWS credentials needed, tests use a mock provider.)
+
+## Cost
+
+Designed to stay close to zero when idle (API Gateway + Lambda + DynamoDB on-demand) with an AWS Budgets alarm as a safety net.
